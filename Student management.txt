@@ -1,0 +1,1144 @@
+/*Ten chuong trinh: Chuong trinh quan li thong tin sinh vien cua truong dai hoc.
+  Doi tuong quan li:
+  - Sinh Vien: + Mssv( Ma so sinh vien).
+               + Tensv( Ten cua sinh).
+               + Khoa( So khoa cua sinh vien: vd: 01,02,...).
+                  + Age( Tuoi cua sinh vien).
+                + Dia chi( Dia chi cua sinh vien).
+               + Phong( So phon KTX cua sinh vien).
+               + Sdt( So dien thoai cua sinh vien).
+               + Gioi tinh( Gioi tinh cua sinh vien).
+(Luu y: Tat ca deu duoc nhap tu ban phim. Mssv KHONG the trung lap nhau. Gioi tinh chi co the la "nam" hoac "nu").        
+  - Lop: + Tenlop( Ten lop).
+         + Khoa( Ten khoa dang hoc. vd: CNTT, O TO, CO KHI,...).
+         + Gvcn( Ten cua giao vien chu nhiem).
+         + Nam( So luong sinh vien nam).
+         + Nu( So luong sinh vien nu).
+         + Soluong( Si so cua lop do).
+         +Sinhvien( Toan bo thong tin sinh vien cua lop).
+(Luu y: Tenlop,Khoa,Gvcn duoc nhap tu ban phim. Cac thong tin con lai chuong trinh tu tong hop).  
+   *Cac chuc nang chinh:
+         + Nhap thong tin can quan li(Nhap lop va sinh vien cua lop).
+         + Sap xep danh sach( Danh sach se duoc sap xep theo thu tu bang chu cai cua ten).
+         + Xem thong tin( Xuat ra danh sach).
+         + Them lop( Them lop khac can quan li).
+         + Them sinh vien( Them sinh vien khac vao lop da co).
+         + Tim sinh vien theo phon  KTX.
+         + Tim sinh vien theo dia chi.
+         + Tim sinh vien theo gioi tinh.
+    * Cac tinh nang khac: + Ten sinh vien, dia chi sinh vien va ten GVCN se tu dong in hoa chu cai dau.
+                          +    Ten sinh vien va ten GVCN se tu dong bo dau cach thua.
+         
+*/
+
+
+
+
+#include <stdio.h>
+#include <conio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <windows.h>
+#include <stdlib.h>
+
+
+typedef struct{
+    char mssv[30];
+    char tensv[50];
+    int khoa;
+    int age;
+    char diachi[100];
+    int phong;
+    char sdt[20];
+    char gioitinh[20];
+}SinhVien;
+
+typedef struct {
+char tenlop[20];
+char khoa[50];
+char gvcn[50];
+int soluong;
+int nam;
+int nu;
+SinhVien SV;
+int demnam;
+int demnu;
+}Lop;
+
+
+int xoa1(char a[], int q)
+{
+    int n = strlen(a), i;
+    for (i = q; i <= n; i++)
+        {
+         a[i] = a[i + 1];
+        }
+    n--;
+    return a;
+}
+
+int xoa(char a[])
+{
+    int i, n=strlen(a);
+    for (i = 0; i < n; i++)
+        {
+            if (a[0] == 32)
+                {
+                    xoa1(a, 0);
+                    n--;
+                }
+            if (a[n-1] == 32)
+                {
+                    xoa1(a, n-1);
+                    n--;
+                }
+            if (a[i] == 32 && a[i + 1] == 32)
+                {
+                    xoa1(a, i);
+                    i--;
+                    n--;
+                }
+    }
+    return a;
+}
+
+char inhoa(char s[])
+{
+  int i;
+if(s[0]>='a'&&s[0]<='z')                              
+      {
+         s[0]=s[0]-32;
+         }
+     for(i=1;i<strlen(s);i++)
+        {
+if(s[i]==' ' && s[i+1]>='a' && s[i+1]<='z' )
+         {
+     s[i+1]=s[i+1]-32;
+           }        
+               }
+return s;
+}
+
+Lop b[1000];
+SinhVien a[1000][1000];
+int soluongsv[100];
+int soluonglop;
+int t=0;
+int i,j;
+
+void nhapLop(){
+i=0;
+char ktlop[10],ktlop1[10],ktlop2[10];
+strcpy(ktlop1,"yes");
+strcpy(ktlop2,"stop");
+do{
+i++;
+t++;
+fflush(stdin);
+printf("\n\t\t\t**             BAT DAU NHAP THONG TIN CHO LOP               **\n");
+printf("\nNhap ten lop: "); gets(b[i].tenlop);
+printf("\nNhap ten khoa: "); gets(b[i].khoa);
+printf("\nNhap ten GVCN: "); gets(b[i].gvcn);
+xoa(b[i].gvcn);
+    inhoa(b[i].gvcn);
+system("cls");
+nhapSinhVien();
+system("cls");
+do{
+printf("\nBan muon nhap lop tiep theo khong('yes' hoac 'stop'):");
+gets(ktlop);
+    }
+while ((strcmp(ktlop,ktlop1)!=0)&&(strcmp(ktlop,ktlop2)!=0));
+system("cls");
+}
+while (strcmp(ktlop,ktlop2)!=0);
+soluonglop=i;
+system("cls");
+}
+
+
+char kt1[100],kt2[100],kt3[100],kt4[100];
+
+void nhapSinhVien(){
+  j=0;
+  int l,ktmssv;
+  char ktSV[10];
+  strcpy(kt1,"nam");
+  strcpy(kt2,"nu");
+  strcpy(kt3,"yes");
+strcpy(kt4,"no");
+  do{
+  printf("\t\t\t**             BAT DAU NHAP THONG TIN SINH VIEN LOP %s      **\n",b[i].tenlop);
+  j++;
+  fflush(stdin);
+   printf("\nNhap ma so sinh vien thu %d : ",j); gets(a[i][j].mssv);
+        ktmssv=1;
+     do{
+     ktmssv=1;
+     for(l=1;l<j;l++)
+     if (strcmp(a[i][l].mssv,a[i][j].mssv)==0) ktmssv=0;
+     if (ktmssv==0){
+         fflush(stdin);
+           printf("\nMSSV khong the trung lap.Vui long nhap lai: ");
+         gets(a[i][j].mssv);
+     }
+     }while (ktmssv!=1);
+   
+   
+        printf("\nNhap ten sinh vien thu %d : ",j); gets(a[i][j].tensv);
+        xoa(a[i][j].tensv);
+        inhoa(a[i][j].tensv);
+        printf("\nNhap nien khoa cua sinh vien thu %d : ",j); scanf("%d",&a[i][j].khoa);
+        do{
+      printf("\nNhap tuoi sinh vien thu %d: ",j); scanf("%d",&(a[i][j].age));
+}
+        while (a[i][j].age<=0);
+        fflush(stdin);
+        printf("\nNhap dia chi sinh vien thu %d: ",j); gets(a[i][j].diachi);
+         xoa(a[i][j].diachi);
+        inhoa(a[i][j].diachi);
+        printf("\nNhap so phong ktx sinh vien thu %d: ",j); scanf("%d",&(a[i][j].phong));
+        fflush(stdin);
+        printf("\nNhap so dien thoai sinh vien thu %d: ",j); gets(a[i][j].sdt);
+        do{
+        printf("\nNhap gioi tinh sinh vien thu %d('nam' hoac 'nu'): ",j); gets(a[i][j].gioitinh);
+        if (strcmp(a[i][j].gioitinh,"nam")==0) b[i].demnam=b[i].demnam+1;
+        else if (strcmp(a[i][j].gioitinh,"nu")==0) b[i].demnu=b[i].demnu+1;
+}
+    while ((strcmp(a[i][j].gioitinh,kt1)!=0)&&(strcmp(kt2,a[i][j].gioitinh)!=0));
+    system("cls");
+    do{
+printf("\nBan muon nhap sinh tiep theo khong('yes' hoac 'no'):");
+gets(ktSV);
+    }
+while ((strcmp(ktSV,kt3)!=0)&&(strcmp(kt4,ktSV)!=0));
+system("cls");
+}
+  while (strcmp(kt4,ktSV)!=0);
+  soluongsv[t]=j;
+}
+
+
+
+ 
+char ktxem1[10],ktxem2[10],ktxem[10],ktxem3[10];
+
+void xemtt(){
+  int h,l,c;
+  char xemlop[100],ten[100];
+    strcpy(ktxem1,"no");
+    strcpy(ktxem2,"yes");
+    strcpy(ktxem3,"stop");
+  do{
+  l=0;
+  fflush(stdin);
+  printf("\nNhap lop ban muon xem thong tin: ");gets(xemlop);
+    for (h=1;h<=soluonglop;h++)
+    if (strcmp(xemlop,b[h].tenlop)==0) l=h;
+    while (l==0){
+   printf("Khong co lop ban tim. Vui long nhap lai: ");
+   gets(xemlop);
+   for (h=1;h<=soluonglop;h++){
+            if (strcmp(xemlop,b[h].tenlop)==0) l=h;}
+}
+system("cls");
+printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN LOP %s               **\n",b[l].tenlop);
+printf("\nSI SO: %-25d",soluongsv[l]);
+printf("\tNAM: %d",b[l].demnam);
+printf("\nTEN GVCN: %-25s",b[l].gvcn);
+printf("\tNU: %d",b[l].demnu);
+printf("\nTEN KHOA: %s\n",b[l].khoa);
+printf("\n ================================================================================================================================================================");
+printf("\n| %-05s  |  %-30s  |  %-30s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+for (c=1;c<=soluongsv[l];c++){
+printf("\n| %-05s  |  %-30s  |  %-30d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",a[l][c].mssv,a[l][c].tensv,a[l][c].khoa,a[l][c].age,a[l][c].diachi,a[l][c].phong,a[l][c].sdt,a[l][c].gioitinh);
+printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+}
+printf("\n ================================================================================================================================================================");
+  do{
+  printf("\nBan muon xem tiep hay dung lai ('yes' or 'stop'): ");
+  gets(ktxem);}
+  while ((strcmp(ktxem,ktxem2)!=0)&&(strcmp(ktxem,ktxem3)!=0));
+system("cls");
+} while (strcmp(ktxem,ktxem3)!=0);
+}
+
+
+char ktchinhsua[10],ktchinhsua1[10],ktchinhsua2[10],ktchinhsua3[10],chinhsua[10];
+ 
+void chinhsuasinhvien(){
+int h1,l1,c1,ktmssv,l;
+  do{
+  l1=0;
+  fflush(stdin);
+  printf("\nNhap lop ban muon them sinh vien: ");gets(chinhsua);
+    for (h1=1;h1<=soluonglop;h1++){
+    if (strcmp(chinhsua,b[h1].tenlop)==0) l1=h1;
+}
+while (l1==0){
+printf("Khong co lop ban nhap. Vui long nhap lai: ");
+gets(chinhsua);
+for (h1=1;h1<=soluonglop;h1++){
+    if (strcmp(chinhsua,b[h1].tenlop)==0) l1=h1;}
+}
+system("cls");
+j=soluongsv[l1];
+  char ktSV[10];
+  strcpy(kt1,"nam");
+  strcpy(kt2,"nu");
+  strcpy(kt3,"yes");
+strcpy(kt4,"no");
+  do{
+  j++;
+  fflush(stdin);
+  printf("\t\t\t**             BAT DAU NHAP THONG TIN SINH VIEN LOP %s      **\n",chinhsua);
+   printf("\nNhap ma so sinh vien : "); gets(a[l1][j].mssv);
+     ktmssv=1;
+     do{
+     ktmssv=1;
+     for(l=1;l<j;l++)
+     if (strcmp(a[l1][l].mssv,a[l1][j].mssv)==0) ktmssv=0;
+     if (ktmssv==0){
+         fflush(stdin);
+           printf("\nMSSV khong the trung lap.Vui long nhap lai: ");
+         gets(a[l1][j].mssv);
+     }
+     }while (ktmssv!=1);
+ 
+        printf("\nNhap ten sinh vien : "); gets(a[l1][j].tensv);
+        xoa(a[l1][j].tensv);
+        inhoa(a[l1][j].tensv);
+        printf("\nNhap nien khoa cua sinh vien : "); scanf("%d",&a[l1][j].khoa);
+        do{
+      printf("\nNhap tuoi sinh vien: "); scanf("%d",&(a[l1][j].age));
+}
+        while (a[l1][j].age<=0);
+        fflush(stdin);
+        printf("\nNhap dia chi sinh vien: "); gets(a[l1][j].diachi);
+        xoa(a[l1][j].diachi);
+        inhoa(a[l1][j].diachi);
+        printf("\nNhap so phong ktx sinh vien: "); scanf("%d",&(a[l1][j].phong));
+        fflush(stdin);
+        printf("\nNhap so dien thoai sinh vien: "); gets(a[l1][j].sdt);
+        do{
+        printf("\nNhap gioi tinh sinh vien('nam' hoac 'nu'): "); gets(a[l1][j].gioitinh);
+        if (strcmp(a[l1][j].gioitinh,"nam")==0) b[l1].demnam=b[l1].demnam+1;
+        else if (strcmp(a[l1][j].gioitinh,"nu")==0) b[l1].demnu=b[l1].demnu+1;
+}
+    while ((strcmp(a[l1][j].gioitinh,kt1)!=0)&&(strcmp(kt2,a[l1][j].gioitinh)!=0));
+    system("cls");
+    do{
+printf("\nBan muon nhap sinh tiep theo khong('yes' hoac 'no'):");
+gets(ktSV);
+    }
+while ((strcmp(ktSV,kt3)!=0)&&(strcmp(kt4,ktSV)!=0));
+system("cls");
+}
+  while (strcmp(kt4,ktSV)!=0);
+  soluongsv[l1]=j;
+  system("cls");
+do{
+  printf("\nBan muon nhap them sinh vien lop khac khong ('yes' or 'stop'): ");
+  gets(ktchinhsua);}
+  while ((strcmp(ktchinhsua,ktchinhsua1)!=0)&&(strcmp(ktchinhsua,ktchinhsua3)!=0));
+  system("cls");
+}
+while (strcmp(ktchinhsua,ktchinhsua3)!=0);
+system("cls");
+}
+
+
+char ktchinhsualop[10],ktchinhsualop1[10],ktchinhsualop2[10],ktchinhsualop3[10],chinhsualop[10];
+void chinhsualop1(){
+int h2,l2,c2;
+  strcpy(ktchinhsualop1,"yes");
+  strcpy(ktchinhsualop2,"no");
+  strcpy(ktchinhsualop3,"stop");
+  i=soluonglop;
+  do{
+  l2=0;
+  i++;
+  t++;
+  printf("\n\t\t\t**             BAT DAU NHAP THONG TIN CHO LOP               **\n");
+  fflush(stdin);
+  printf("\nNhap lop: ");gets(b[i].tenlop);
+    for (h2=1;h2<=soluonglop;h2++){
+    if (strcmp(b[i].tenlop,b[h2].tenlop)==0) l2=h2;
+}
+while (l2!=0){
+l2=0;
+printf("Lop ban nhap da ton tai. Vui long nhap lai: ");
+gets(b[i].tenlop);
+for (h2=1;h2<=soluonglop;h2++){
+    if (strcmp(b[i].tenlop,b[h2].tenlop)==0) l2=h2;}
+}
+fflush(stdin);
+printf("\nNhap khoa: "); gets(b[i].khoa);
+printf("\nNhap ten GVCN: "); gets(b[i].gvcn);
+xoa(b[i].gvcn);
+        inhoa(b[i].gvcn);
+system("cls");
+nhapSinhVien();
+system("cls");
+do{
+  printf("\nBan co muon them lop('yes' or 'stop'): ");
+  gets(ktchinhsualop);}
+  while ((strcmp(ktchinhsualop,ktchinhsualop1)!=0)&&(strcmp(ktchinhsualop,ktchinhsualop3)!=0));
+}while (strcmp(ktchinhsualop,ktchinhsualop3)!=0);
+system("cls");
+soluonglop=i;}
+
+char timktx[100],timktx2[100],lopktx[100];
+void timKTX(){
+int h3,m,phongktx,k,g;
+do{
+fflush(stdin);
+printf("\nBan muon tim theo lop hay toan bo('class' or 'full'): ");
+gets(timktx);}
+while ((strcmp(timktx,"class")!=0)&&(strcmp(timktx,"full")!=0));
+system("cls");
+if (strcmp(timktx,"class")==0){
+h3=0;
+printf("\nNhap lop can tim: ");
+gets(lopktx);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopktx,b[m].tenlop)==0) h3=m;
+
+while (h3==0) {
+printf("\nLop khong ton tai. Nhap lop can tim: ");
+gets(lopktx);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopktx,b[m].tenlop)==0) h3=m;
+}
+system("cls");
+printf("\nNhap phong KTX: ");
+scanf("%d",&phongktx);
+int ktktx=0;
+g=0;
+    for (m=1;m<=soluongsv[h3];m++)
+   if (phongktx==a[h3][m].phong) {
+    g++;
+  ktktx=1;}
+  system("cls");
+if (ktktx==0) printf("\nKhong co sinh vien nao cua lop %s trong phong %d",b[h3].tenlop,phongktx);
+else {
+
+printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN PHONG %d             **\n",phongktx);
+
+printf("\n ================================================================================================================================================================");
+printf("\n| %-05s  |  %-30s  |  %-30s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+for (m=1;m<=soluongsv[h3];m++)
+if (a[h3][m].phong==phongktx) {
+printf("\n| %-05s  |  %-30s  |  %-30d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",a[h3][m].mssv,a[h3][m].tensv,a[h3][m].khoa,a[h3][m].age,a[h3][m].diachi,a[h3][m].phong,a[h3][m].sdt,a[h3][m].gioitinh);
+printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+}
+
+   
+}
+printf("\n ================================================================================================================================================================");
+
+do{
+   printf("\nBan muon tim tiep hay dung lai ('yes' or 'stop'): ");
+   fflush(stdin);
+gets(timktx2);}
+while ((strcmp(timktx2,"yes")!=0)&&(strcmp(timktx2,"stop")!=0));
+system("cls");
+while(strcmp(timktx2,"stop")!=0){
+h3=0;
+printf("\nNhap lop can tim: ");
+gets(lopktx);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopktx,b[m].tenlop)==0) h3=m;
+ 
+while (h3==0) {
+printf("\nLop khong ton tai. Nhap lop can tim: ");
+gets(lopktx);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopktx,b[m].tenlop)==0) h3=m;
+}
+system("cls");
+printf("\nNhap phong KTX: ");
+scanf("%d",&phongktx);
+ktktx=0;
+g=0;
+    for (m=1;m<=soluongsv[h3];m++)
+    if (phongktx==a[h3][m].phong) {
+     g++;
+  ktktx=1;}
+  system("cls");
+       if (ktktx==0) printf("\nKhong co sinh vien nao cua lop %s trong phong %d",b[h3].tenlop,phongktx);
+       else {
+        printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN PHONG %d             **\n",phongktx);
+     
+printf("\n ================================================================================================================================================================");
+printf("\n| %-05s  |  %-30s  |  %-30s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+for (m=1;m<=soluongsv[h3];m++)
+if (a[h3][m].phong==phongktx) {
+printf("\n| %-05s  |  %-30s  |  %-30d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",a[h3][m].mssv,a[h3][m].tensv,a[h3][m].khoa,a[h3][m].age,a[h3][m].diachi,a[h3][m].phong,a[h3][m].sdt,a[h3][m].gioitinh);
+     printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+}
+
+   
+}
+printf("\n ================================================================================================================================================================");
+        do{
+        printf("\nBan muon tim tiep hay dung lai ('yes' or 'stop'): ");
+    fflush(stdin);
+gets(timktx2);}
+
+while ((strcmp(timktx2,"yes")!=0)&&(strcmp(timktx2,"stop")!=0));
+system("cls");
+}
+}
+
+else {
+printf("\nNhap phong KTX: ");
+scanf("%d",&phongktx);
+
+system("cls");
+g=0;
+int ktktx=0;
+for (k=1;k<=soluonglop;k++)
+           for (m=1;m<=soluongsv[k];m++)
+    if (phongktx==a[k][m].phong) {
+    g++;
+  ktktx=1;}
+if (ktktx==0) printf("\nKhong co sinh vien nao trong phong %d",phongktx);
+        else{
+        printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN PHONG %d             **\n",phongktx);
+        printf("\n ================================================================================================================================================================");
+printf("\n| %-10s | %-05s  |  %-27s  |  %-20s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","LOP","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+        for (k=1;k<=soluonglop;k++)
+for (m=1;m<=soluongsv[k];m++)
+    if (phongktx==a[k][m].phong) {
+    printf("\n| %-10s | %-05s  |  %-27s  |  %-20d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",b[k].tenlop,a[k][m].mssv,a[k][m].tensv,a[k][m].khoa,a[k][m].age,a[k][m].diachi,a[k][m].phong,a[k][m].sdt,a[k][m].gioitinh);
+printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+
+   
+}
+printf("\n ================================================================================================================================================================");
+ 
+}
+do{
+   printf("\nBan muon tim tiep hay dung lai ('yes' or 'stop'): ");
+   fflush(stdin);
+gets(timktx2);}
+while ((strcmp(timktx2,"yes")!=0)&&(strcmp(timktx2,"stop")!=0));
+system("cls");
+while(strcmp(timktx2,"stop")!=0){
+printf("\nNhap phong KTX: ");
+scanf("%d",&phongktx);
+ktktx=0;
+g=0;
+for (k=1;k<=soluonglop;k++)
+    for (m=1;m<=soluongsv[k];m++)
+    if (phongktx==a[k][m].phong) {
+  g++;
+  ktktx=1;}
+  system("cls");
+       if (ktktx==0) printf("\nKhong co sinh vien nao trong phong %d",phongktx);
+       else{
+     
+        printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN PHONG %d             **\n",phongktx);
+       printf("\n ================================================================================================================================================================");
+printf("\n| %-10s | %-05s  |  %-27s  |  %-20s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","LOP","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+        for (k=1;k<=soluonglop;k++)
+for (m=1;m<=soluongsv[k];m++)
+    if (phongktx==a[k][m].phong) {
+    printf("\n| %-10s | %-05s  |  %-27s  |  %-20d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",b[k].tenlop,a[k][m].mssv,a[k][m].tensv,a[k][m].khoa,a[k][m].age,a[k][m].diachi,a[k][m].phong,a[k][m].sdt,a[k][m].gioitinh);
+printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");
+
+   
+}
+printf("\n ================================================================================================================================================================");
+}
+        do{
+        printf("\nBan muon tim tiep hay dung lai ('yes' or 'stop'): ");
+    fflush(stdin);
+gets(timktx2);}
+
+while ((strcmp(timktx2,"yes")!=0)&&(strcmp(timktx2,"stop")!=0));
+}
+}
+}
+
+char timdiachi[100],timdiachi2[100],lopdiachi[100],diachisv[100];
+void timDIACHI(){
+int h3,m,k,g;
+do{
+fflush(stdin);
+printf("\nBan muon tim theo lop hay toan bo('class' or 'full'): ");
+gets(timdiachi);}
+while ((strcmp(timdiachi,"class")!=0)&&(strcmp(timdiachi,"full")!=0));
+system("cls");
+if (strcmp(timdiachi,"class")==0){
+h3=0;
+fflush(stdin);
+printf("\nNhap lop can tim: ");
+gets(lopdiachi);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopdiachi,b[m].tenlop)==0) h3=m;
+ 
+while (h3==0) {
+printf("\nLop khong ton tai. Nhap lop can tim: ");
+gets(lopdiachi);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopdiachi,b[m].tenlop)==0) h3=m;
+}
+system("cls");
+fflush(stdin);
+printf("\nNhap DIA CHI: ");
+gets(diachisv);
+xoa(diachisv);
+inhoa(diachisv);
+int ktktx=0;
+g=0;
+    for (m=1;m<=soluongsv[h3];m++)
+   if (strcmp(diachisv,a[h3][m].diachi)==0) {
+    g++;
+  ktktx=1;}
+  system("cls");
+if (ktktx==0) printf("\nKhong co sinh vien nao cua lop %s co dia chi %s",b[h3].tenlop,diachisv);
+else {
+
+printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN CO DIA CHI %s        **\n",diachisv);
+printf("\n ================================================================================================================================================================");
+printf("\n| %-05s  |  %-30s  |  %-30s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+for (m=1;m<=soluongsv[h3];m++)
+if (strcmp(a[h3][m].diachi,diachisv)==0) {
+
+printf("\n| %-05s  |  %-30s  |  %-30d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",a[h3][m].mssv,a[h3][m].tensv,a[h3][m].khoa,a[h3][m].age,a[h3][m].diachi,a[h3][m].phong,a[h3][m].sdt,a[h3][m].gioitinh);
+printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");}
+  printf("\n ================================================================================================================================================================");
+
+   
+}
+
+do{
+   printf("\nBan muon tim tiep hay dung lai ('yes' or 'stop'): ");
+   fflush(stdin);
+gets(timdiachi2);}
+while ((strcmp(timdiachi2,"yes")!=0)&&(strcmp(timdiachi2,"stop")!=0));
+system("cls");
+
+while(strcmp(timdiachi2,"stop")!=0){
+h3=0;
+fflush(stdin);
+printf("\nNhap lop can tim: ");
+gets(lopdiachi);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopdiachi,b[m].tenlop)==0) h3=m;
+ 
+while (h3==0) {
+printf("\nLop khong ton tai. Nhap lop can tim: ");
+gets(lopdiachi);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopdiachi,b[m].tenlop)==0) h3=m;
+}
+system("cls");
+printf("\nNhap DIA CHI: ");
+gets(diachisv);
+xoa(diachisv);
+inhoa(diachisv);
+ktktx=0;
+g=0;
+    for (m=1;m<=soluongsv[h3];m++)
+    if (strcmp(diachisv,a[h3][m].diachi)==0) {
+     g++;
+  ktktx=1;}
+  system("cls");
+       if (ktktx==0) printf("\nKhong co sinh vien nao cua lop %s co dia chi %s",b[h3].tenlop,diachisv);
+       else {
+        printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN CO DIA CHI %s        **\n",diachisv);
+printf("\n ================================================================================================================================================================");
+printf("\n| %-05s  |  %-30s  |  %-30s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+for (m=1;m<=soluongsv[h3];m++)
+if (strcmp(diachisv,a[h3][m].diachi)==0) {
+
+printf("\n| %-05s  |  %-30s  |  %-30d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",a[h3][m].mssv,a[h3][m].tensv,a[h3][m].khoa,a[h3][m].age,a[h3][m].diachi,a[h3][m].phong,a[h3][m].sdt,a[h3][m].gioitinh);
+printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");}
+  printf("\n ================================================================================================================================================================");
+
+   
+}
+        do{
+        printf("\nBan muon tim tiep hay dung lai ('yes' or 'stop'): ");
+    fflush(stdin);
+gets(timdiachi2);}
+while ((strcmp(timdiachi2,"yes")!=0)&&(strcmp(timdiachi2,"stop")!=0));
+system("cls");
+}
+}
+else {
+printf("\nNhap DIA CHI: ");
+gets(diachisv);
+xoa(diachisv);
+inhoa(diachisv);
+
+g=0;
+int ktktx=0;
+for (k=1;k<=soluonglop;k++)
+           for (m=1;m<=soluongsv[k];m++)
+    if (strcmp(diachisv,a[k][m].diachi)==0) {
+    g++;
+  ktktx=1;}
+  system("cls");
+if (ktktx==0) printf("\nKhong co sinh vien nao co dia chi %s",diachisv);
+        else{
+        printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN CO DIA CHI %s        **\n",diachisv);
+        printf("\n ================================================================================================================================================================");
+printf("\n| %-10s | %-05s  |  %-27s  |  %-20s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","LOP","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+        for (k=1;k<=soluonglop;k++)
+for (m=1;m<=soluongsv[k];m++)
+    if (strcmp(diachisv,a[k][m].diachi)==0) {
+    printf("\n| %-10s | %-05s  |  %-27s  |  %-20d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",b[k].tenlop,a[k][m].mssv,a[k][m].tensv,a[k][m].khoa,a[k][m].age,a[k][m].diachi,a[k][m].phong,a[k][m].sdt,a[k][m].gioitinh);
+printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");}
+  printf("\n ================================================================================================================================================================");
+
+   
+ 
+}
+do{
+   printf("\nBan muon tim tiep hay dung lai ('yes' or 'stop'): ");
+   fflush(stdin);
+gets(timdiachi2);}
+while ((strcmp(timdiachi2,"yes")!=0)&&(strcmp(timdiachi2,"stop")!=0));
+system("cls");
+while(strcmp(timdiachi2,"stop")!=0){
+printf("\nNhap DIA CHI: ");
+gets(diachisv);
+xoa(diachisv);
+inhoa(diachisv);
+ktktx=0;
+g=0;
+for (k=1;k<=soluonglop;k++)
+    for (m=1;m<=soluongsv[k];m++)
+    if (strcmp(diachisv,a[k][m].diachi)==0) {
+  g++;
+  ktktx=1;}
+  system("cls");
+       if (ktktx==0) printf("\nKhong co sinh vien nao co dia chi %s",diachisv);
+       else{
+     
+        printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN CO DIA CHI %s        **\n",diachisv);
+       printf("\n ================================================================================================================================================================");
+printf("\n| %-10s | %-05s  |  %-27s  |  %-20s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","LOP","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+        for (k=1;k<=soluonglop;k++)
+for (m=1;m<=soluongsv[k];m++)
+    if (strcmp(diachisv,a[k][m].diachi)==0) {
+    printf("\n| %-10s | %-05s  |  %-27s  |  %-20d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",b[k].tenlop,a[k][m].mssv,a[k][m].tensv,a[k][m].khoa,a[k][m].age,a[k][m].diachi,a[k][m].phong,a[k][m].sdt,a[k][m].gioitinh);
+printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");}
+  printf("\n ================================================================================================================================================================");
+
+   
+
+}
+        do{
+        printf("\nBan muon tim tiep hay dung lai ('yes' or 'stop'): ");
+    fflush(stdin);
+gets(timdiachi2);}
+while ((strcmp(timdiachi2,"yes")!=0)&&(strcmp(timdiachi2,"stop")!=0));
+system("cls");
+}
+}
+}
+
+
+
+char timgioitinh[100],timgioitinh2[100],lopgioitinh[100],gioitinhsv[100];
+void timGIOITINH(){
+int h3,m,k,g;
+
+do{
+fflush(stdin);
+printf("\nBan muon tim theo lop hay toan bo('class' or 'full'): ");
+gets(timgioitinh);}
+while ((strcmp(timgioitinh,"class")!=0)&&(strcmp(timgioitinh,"full")!=0));
+system("cls");
+if (strcmp(timgioitinh,"class")==0){
+h3=0;
+fflush(stdin);
+printf("\nNhap lop can tim: ");
+gets(lopgioitinh);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopgioitinh,b[m].tenlop)==0) h3=m;
+ 
+while (h3==0) {
+printf("\nLop khong ton tai. Nhap lop can tim: ");
+gets(lopgioitinh);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopgioitinh,b[m].tenlop)==0) h3=m;
+}
+system("cls");
+fflush(stdin);
+do{
+printf("\nNhap GIOI TINH ('nam' or 'nu'): ");
+gets(gioitinhsv);}
+while (strcmp(gioitinhsv,"nam")!=0&&strcmp(gioitinhsv,"nu")!=0);
+int ktktx=0;
+g=0;
+    for (m=1;m<=soluongsv[h3];m++)
+   if (strcmp(gioitinhsv,a[h3][m].gioitinh)==0) {
+    g++;
+  ktktx=1;}
+  system("cls");
+if (ktktx==0) printf("\nKhong co sinh vien nao cua lop %s co gioi tinh %s",b[h3].tenlop,gioitinhsv);
+else {
+
+printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN CO GIOI TINH %s      **\n",gioitinhsv);
+printf("\n ================================================================================================================================================================");
+printf("\n| %-05s  |  %-30s  |  %-30s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+for (m=1;m<=soluongsv[h3];m++)
+if (strcmp(a[h3][m].gioitinh,gioitinhsv)==0) {
+
+printf("\n| %-05s  |  %-30s  |  %-30d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",a[h3][m].mssv,a[h3][m].tensv,a[h3][m].khoa,a[h3][m].age,a[h3][m].diachi,a[h3][m].phong,a[h3][m].sdt,a[h3][m].gioitinh);
+printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");}
+  printf("\n ================================================================================================================================================================");
+
+   
+}
+
+do{
+   printf("\nBan muon tim tiep hay dung lai ('yes' or 'stop'): ");
+   fflush(stdin);
+gets(timgioitinh2);}
+while ((strcmp(timgioitinh2,"yes")!=0)&&(strcmp(timgioitinh2,"stop")!=0));
+system("cls");
+while(strcmp(timgioitinh2,"stop")!=0){
+h3=0;
+fflush(stdin);
+printf("\nNhap lop can tim: ");
+gets(lopgioitinh);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopgioitinh,b[m].tenlop)==0) h3=m;
+ 
+while (h3==0) {
+printf("\nLop khong ton tai. Nhap lop can tim: ");
+gets(lopgioitinh);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopgioitinh,b[m].tenlop)==0) h3=m;
+}
+system("cls");
+do{
+printf("\nNhap GIOI TINH ('nam' or 'nu'): ");
+gets(gioitinhsv);}
+while (strcmp(gioitinhsv,"nam")!=0&&strcmp(gioitinhsv,"nu")!=0);
+ktktx=0;
+g=0;
+    for (m=1;m<=soluongsv[h3];m++)
+    if (strcmp(gioitinhsv,a[h3][m].gioitinh)==0) {
+     g++;
+  ktktx=1;}
+  system("cls");
+       if (ktktx==0) printf("\nKhong co sinh vien nao cua lop %s co gioi tinh %s",b[h3].tenlop,gioitinhsv);
+       else {
+        printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN CO GIOI TINH %s      **\n",gioitinhsv);
+printf("\n ================================================================================================================================================================");
+printf("\n| %-05s  |  %-30s  |  %-30s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+for (m=1;m<=soluongsv[h3];m++)
+if (strcmp(gioitinhsv,a[h3][m].gioitinh)==0) {
+
+printf("\n| %-05s  |  %-30s  |  %-30d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",a[h3][m].mssv,a[h3][m].tensv,a[h3][m].khoa,a[h3][m].age,a[h3][m].diachi,a[h3][m].phong,a[h3][m].sdt,a[h3][m].gioitinh);
+printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");}
+  printf("\n ================================================================================================================================================================");
+
+   
+}
+        do{
+        printf("\nBan muon tim tiep hay dung lai ('yes' or 'stop'): ");
+    fflush(stdin);
+gets(timgioitinh2);}
+while ((strcmp(timgioitinh2,"yes")!=0)&&(strcmp(timgioitinh2,"stop")!=0));
+system("cls");
+}
+}
+else {
+do{
+printf("\nNhap GIOI TINH ('nam' or 'nu'): ");
+gets(gioitinhsv);}
+while (strcmp(gioitinhsv,"nam")!=0&&strcmp(gioitinhsv,"nu")!=0);
+
+g=0;
+int ktktx=0;
+for (k=1;k<=soluonglop;k++)
+           for (m=1;m<=soluongsv[k];m++)
+    if (strcmp(gioitinhsv,a[k][m].gioitinh)==0) {
+    g++;
+  ktktx=1;}
+  system("cls");
+if (ktktx==0) printf("\nKhong co sinh vien nao co gioi tinh %s",gioitinhsv);
+        else{
+        printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN CO GIOI TINH %s      **\n",gioitinhsv);
+        printf("\n ================================================================================================================================================================");
+printf("\n| %-10s | %-05s  |  %-27s  |  %-20s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","LOP","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+        for (k=1;k<=soluonglop;k++)
+for (m=1;m<=soluongsv[k];m++)
+    if (strcmp(gioitinhsv,a[k][m].gioitinh)==0) {
+    printf("\n| %-10s | %-05s  |  %-27s  |  %-20d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",b[k].tenlop,a[k][m].mssv,a[k][m].tensv,a[k][m].khoa,a[k][m].age,a[k][m].diachi,a[k][m].phong,a[k][m].sdt,a[k][m].gioitinh);
+printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");}
+  printf("\n ================================================================================================================================================================");
+
+   
+
+ 
+}
+do{
+   printf("\nBan muon tim tiep hay dung lai ('yes' or 'stop'): ");
+   fflush(stdin);
+gets(timgioitinh2);}
+while ((strcmp(timgioitinh2,"yes")!=0)&&(strcmp(timgioitinh2,"stop")!=0));
+system("cls");
+while(strcmp(timgioitinh2,"stop")!=0){
+do{
+printf("\nNhap GIOI TINH ('nam' or 'nu'): ");
+gets(gioitinhsv);}
+while (strcmp(gioitinhsv,"nam")!=0&&strcmp(gioitinhsv,"nu")!=0);
+ktktx=0;
+g=0;
+for (k=1;k<=soluonglop;k++)
+    for (m=1;m<=soluongsv[k];m++)
+    if (strcmp(gioitinhsv,a[k][m].gioitinh)==0) {
+  g++;
+  ktktx=1;}
+  system("cls");
+       if (ktktx==0) printf("\nKhong co sinh vien nao co gioi tinh %s",gioitinhsv);
+       else{
+     
+        printf("\t\t\t\t\t\t**              BANG THONG TIN SINH VIEN CO GIOI TINH %s      **\n",gioitinhsv);
+       printf("\n ================================================================================================================================================================");
+printf("\n| %-10s | %-05s  |  %-27s  |  %-20s |  %-05s  |  %-20s  |  %-05s  |  %-15s  |  %-10s  |","LOP","MSSV","TEN","KHOA","TUOI","DIA CHI","SO PHONG","SO DIEN THOAI","GIOI TINH");
+printf("\n|================================================================================================================================================================|");
+        for (k=1;k<=soluonglop;k++)
+for (m=1;m<=soluongsv[k];m++)
+    if (strcmp(gioitinhsv,a[k][m].gioitinh)==0) {
+    printf("\n| %-10s | %-05s  |  %-27s  |  %-20d |  %-05d  |  %-20s  |  %-08d  |  %-15s  |  %-10s  |",b[k].tenlop,a[k][m].mssv,a[k][m].tensv,a[k][m].khoa,a[k][m].age,a[k][m].diachi,a[k][m].phong,a[k][m].sdt,a[k][m].gioitinh);
+printf("\n|----------------------------------------------------------------------------------------------------------------------------------------------------------------|");}
+  printf("\n ================================================================================================================================================================");
+
+   
+
+}
+        do{
+        printf("\nBan muon tim tiep hay dung lai ('yes' or 'stop'): ");
+    fflush(stdin);
+gets(timgioitinh2);}
+while ((strcmp(timgioitinh2,"yes")!=0)&&(strcmp(timgioitinh2,"stop")!=0));
+system("cls");
+}
+}
+}
+
+
+
+
+void sapxep(){
+fflush(stdin);
+char tt[20],lopsapxep[100];
+int m,m2,h3,yy;
+printf("\nNhap lop can sap xep: ");
+gets(lopsapxep);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopsapxep,b[m].tenlop)==0) h3=m;
+ 
+while (h3==0) {
+printf("\nLop khong ton tai. Nhap lop can sap xep: ");
+gets(lopsapxep);
+for (m=1;m<=soluonglop;m++)
+   if (strcmp(lopsapxep,b[m].tenlop)==0) h3=m;
+}
+system("cls");
+for (m=1;m<=soluongsv[h3];m++)
+for (m2=2;m2<=soluongsv[h3];m2++){
+      if (strcmp(a[h3][m2 - 1].tensv, a[h3][m2].tensv) > 0) {
+           strcpy(tt, a[h3][m2 - 1].tensv);
+            strcpy(a[h3][m2 - 1].tensv, a[h3][m2].tensv);
+            strcpy(a[h3][m2].tensv, tt);
+         
+            yy=a[h3][m2 - 1].age;
+            a[h3][m2 - 1].age=a[h3][m2].age;
+            a[h3][m2].age=yy;
+         
+            strcpy(tt, a[h3][m2 - 1].diachi);
+            strcpy(a[h3][m2 - 1].diachi, a[h3][m2].diachi);
+            strcpy(a[h3][m2].diachi, tt);
+         
+            strcpy(tt, a[h3][m2 - 1].gioitinh);
+            strcpy(a[h3][m2 - 1].gioitinh, a[h3][m2].gioitinh);
+            strcpy(a[h3][m2].gioitinh, tt);
+         
+            yy=a[h3][m2 - 1].khoa;
+            a[h3][m2 - 1].khoa=a[h3][m2].khoa;
+            a[h3][m2].khoa=yy;
+         
+            strcpy(tt, a[h3][m2 - 1].mssv);
+            strcpy(a[h3][m2 - 1].mssv, a[h3][m2].mssv);
+            strcpy(a[h3][m2].mssv, tt);
+         
+            yy=a[h3][m2 - 1].phong;
+            a[h3][m2 - 1].phong=a[h3][m2].phong;
+            a[h3][m2].phong=yy;
+         
+            strcpy(tt, a[h3][m2 - 1].sdt);
+            strcpy(a[h3][m2 - 1].sdt, a[h3][m2].sdt);
+            strcpy(a[h3][m2].sdt, tt);
+         }
+
+}
+}
+
+
+
+
+int main(){
+int key,daNhap;
+char ktsapxep[100];
+daNhap=0;
+strcpy(ktchinhsua1,"yes");
+  strcpy(ktchinhsua2,"no");
+  strcpy(ktchinhsua3,"stop");
+do{
+system("cls");
+        printf("\t\t\t**************************************************************\n");
+        printf("\t\t\t**             CHUONG TRINH QUAN LY SINH VIEN               **\n");
+        printf("\t\t\t**************************************************************\n");
+        printf("\t\t\t============================MENU==============================\n");
+        printf("\t\t\t**             1. Nhap thong tin quan li                    **\n");
+        printf("\t\t\t**             2. Sap xep danh sach theo thu tu cua ten     **\n");
+        printf("\t\t\t**             3. Xem thong tin                             **\n");
+        printf("\t\t\t**             4. Them sinh vien vao danh sach              **\n");
+        printf("\t\t\t**             5. Them lop                                  **\n");
+        printf("\t\t\t**             6. Tim sinh vien theo phong KTX              **\n");
+        printf("\t\t\t**             7. Tim sinh vien theo dia chi                **\n");
+        printf("\t\t\t**             8. Tim sinh vien theo gioi tinh              **\n");
+        printf("\t\t\t**             0. Thoat chuong trinh                        **\n");
+        printf("\t\t\t**************************************************************\n");
+        printf("\t\t\t\**                 Nhap lua chon cua ban                    **\n");
+scanf("%d",&key);
+        switch(key){
+            case 1:
+            system("cls");
+                nhapLop();
+                printf("\nBan da nhap thanh cong!");
+                daNhap = 1;
+                printf("\nBam phim bat ky de tiep tuc!");
+                getch();
+                break;
+                case 2:
+                system("cls");
+                if(daNhap==1){
+                   do{
+   sapxep();
+   printf("\nDanh sach cua ban da duoc sap xep theo ten!");
+   do{
+  printf("\nBan muon sap xep lop khac khong ('yes' or 'stop'): ");
+  fflush(stdin);
+gets(ktsapxep);}while ((strcmp(ktsapxep,"yes")!=0)&&(strcmp(ktsapxep,"stop")!=0));
+system("cls");}while(strcmp(ktsapxep,"stop")!=0);
+
+                }else{
+                    printf("\nKHONG CO THONG TIN. CAN NHAP TRUOC KHI SAP XEP!!!!");
+                }
+                printf("\nBam phim bat ky de tiep tuc!");
+                getch();
+                break;
+            case 3:
+            system("cls");
+                if(daNhap==1){
+                    xemtt();
+                }else{
+                    printf("\nKHONG CO THONG TIN. CAN NHAP TRUOC KHI XEM!!!!");
+                }
+                printf("\nBam phim bat ky de tiep tuc!");
+                getch();
+                break;
+            case 4:
+            system("cls");
+                if(daNhap==1){
+                    chinhsuasinhvien();
+                    do{
+      printf("\nBan co muon xem thong tin sau khi sua ('yes' or 'no'): ");
+  gets(ktchinhsua);}
+  while ((strcmp(ktchinhsua,ktchinhsua1)!=0)&&(strcmp(ktchinhsua,ktchinhsua2)!=0));
+  system("cls");
+  if (strcmp(ktchinhsua,ktchinhsua1)==0) xemtt();
+  system("cls");
+                }else{
+                    printf("\nKHONG CO THONG TIN. CAN NHAP TRUOC KHI CHINH SUA!!!!");
+                }
+                printf("\nBam phim bat ky de tiep tuc!");
+                getch();
+                break;
+           case 5:
+        system("cls");
+                if(daNhap){
+                    chinhsualop1();
+  do{
+      printf("\nBan co muon xem thong tin sau khi sua ('yes' or 'no'): ");
+  gets(ktchinhsua);}
+  while ((strcmp(ktchinhsua,ktchinhsua1)!=0)&&(strcmp(ktchinhsua,ktchinhsua2)!=0));
+  system("cls");
+  if (strcmp(ktchinhsua,ktchinhsua1)==0) xemtt();
+  system("cls");
+                }else{
+                    printf("\nKHONG CO THONG TIN. CAN NHAP TRUOC KHI CHINH SUA!!!!");
+                }
+                printf("\nBam phim bat ky de tiep tuc!");
+                getch();
+                break;
+            case 6:
+            system("cls");
+                if(daNhap){
+                    timKTX();
+                }else{
+                    printf("\nKHONG CO THONG TIN. CAN NHAP TRUOC KHI TIM KIEM!!!!");
+                }
+                printf("\nBam phim bat ky de tiep tuc!");
+                getch();
+                break;
+            case 7:
+            system("cls");
+                if(daNhap){
+                    timDIACHI();
+                }else{
+                    printf("\nKHONG CO THONG TIN. CAN NHAP TRUOC KHI TIM KIEM!!!!");
+                }
+                printf("\nBam phim bat ky de tiep tuc!");
+                getch();
+                break;
+            case 8:
+            system("cls");
+                if(daNhap){
+                    timGIOITINH();
+                }else{
+                    printf("\nKHONG CO THONG TIN. CAN NHAP TRUOC KHI TIM KIEM!!!!");
+                }
+                printf("\nBam phim bat ky de tiep tuc!");
+                getch();
+                break;
+             
+            case 0:
+            system("cls");
+                printf("\nBan da chon thoat chuong trinh!");
+                return 0;
+            default:
+            system("cls");
+                printf("\nKhong co chuc nang nay!");
+                printf("\nBam phim bat ky de tiep tuc!");
+                getch();
+                break;
+        }
+    }while (key);
+}
+
